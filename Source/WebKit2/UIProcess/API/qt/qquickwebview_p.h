@@ -281,6 +281,8 @@ class QWEBKIT_EXPORT QQuickWebViewExperimental : public QObject {
     Q_PROPERTY(QQmlListProperty<QQuickUrlSchemeDelegate> urlSchemeDelegates READ schemeDelegates)
     Q_PROPERTY(QString userAgent READ userAgent WRITE setUserAgent NOTIFY userAgentChanged)
     Q_PROPERTY(QList<QUrl> userScripts READ userScripts WRITE setUserScripts NOTIFY userScriptsChanged)
+    Q_PROPERTY(bool userScriptsInjectAtStart READ userScriptsInjectAtStart WRITE setUserScriptsInjectAtStart NOTIFY userScriptsInjectAtStartChanged)
+    Q_PROPERTY(bool userScriptsForAllFrames READ userScriptsForAllFrames WRITE setUserScriptsForAllFrames NOTIFY userScriptsForAllFramesChanged)
     Q_PROPERTY(QUrl remoteInspectorUrl READ remoteInspectorUrl NOTIFY remoteInspectorUrlChanged FINAL)
 #ifdef HAVE_WEBCHANNEL
     Q_PROPERTY(QQmlWebChannel* webChannel READ webChannel WRITE setWebChannel NOTIFY webChannelChanged)
@@ -331,6 +333,10 @@ public:
     void setDeviceHeight(int);
     QList<QUrl> userScripts() const;
     void setUserScripts(const QList<QUrl>& userScripts);
+    bool userScriptsInjectAtStart() const;
+    void setUserScriptsInjectAtStart(bool);
+    bool userScriptsForAllFrames() const;
+    void setUserScriptsForAllFrames(bool);
     QUrl remoteInspectorUrl() const;
 
     QWebKitTest* test();
@@ -396,6 +402,8 @@ Q_SIGNALS:
     void enterFullScreenRequested();
     void exitFullScreenRequested();
     void userScriptsChanged();
+    void userScriptsInjectAtStartChanged();
+    void userScriptsForAllFramesChanged();
     void preferredMinimumContentsWidthChanged();
     void remoteInspectorUrlChanged();
     void textFound(int matchCount);

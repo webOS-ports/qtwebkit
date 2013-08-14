@@ -214,6 +214,8 @@ protected:
     QQmlComponent* colorChooser;
 
     QList<QUrl> userScripts;
+    bool userScriptsInjectAtStart;
+    bool userScriptsForAllFrames;
 
     bool m_betweenLoadCommitAndFirstFrame;
     bool m_useDefaultContentItemSize;
