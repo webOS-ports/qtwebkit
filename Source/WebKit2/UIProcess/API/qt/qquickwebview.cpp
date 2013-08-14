@@ -298,6 +298,8 @@ QQuickWebViewPrivate::QQuickWebViewPrivate(QQuickWebView* viewport)
     , filePicker(0)
     , databaseQuotaDialog(0)
     , colorChooser(0)
+    , userScriptsInjectAtStart(false)
+    , userScriptsForAllFrames(false)
     , m_betweenLoadCommitAndFirstFrame(false)
     , m_useDefaultContentItemSize(true)
     , m_navigatorQtObjectEnabled(false)
@@ -909,7 +911,12 @@ void QQuickWebViewPrivate::updateUserScripts()
         WKRetainPtr<WKStringRef> contents = readUserScript(url);
         if (!contents || WKStringIsEmpty(contents.get()))
             continue;
-        WKPageGroupAddUserScript(pageGroup.get(), contents.get(), /*baseURL*/ 0, /*whitelistedURLPatterns*/ 0, /*blacklistedURLPatterns*/ 0, kWKInjectInTopFrameOnly, kWKInjectAtDocumentEnd);
+
+        WKUserContentInjectedFrames injectedFrames = userScriptsForAllFrames ? kWKInjectInAllFrames :  kWKInjectInTopFrameOnly;
+        WKUserScriptInjectionTime injectionTime = userScriptsInjectAtStart ? kWKInjectAtDocumentStart : kWKInjectAtDocumentEnd;
+
+        WKPageGroupAddUserScript(pageGroup.get(), contents.get(), /*baseURL*/ 0, /*whitelistedURLPatterns*/ 0, /*blacklistedURLPatterns*/ 0,
+                                 injectedFrames, injectionTime);
     }
 }
 
@@ -1468,6 +1475,34 @@ void QQuickWebViewExperimental::setUserScripts(const QList<QUrl>& userScripts)
     d->userScripts = userScripts;
     d->updateUserScripts();
     emit userScriptsChanged();
+}
+
+bool QQuickWebViewExperimental::userScriptsInjectAtStart() const
+{
+    Q_D(const QQuickWebView);
+    return d->userScriptsInjectAtStart;
+}
+
+void QQuickWebViewExperimental::setUserScriptsInjectAtStart(bool injectAtStart)
+{
+    Q_D(QQuickWebView);
+    d->userScriptsInjectAtStart = injectAtStart;
+    d->updateUserScripts();
+    emit userScriptsInjectAtStartChanged();
+}
+
+bool QQuickWebViewExperimental::userScriptsForAllFrames() const
+{
+    Q_D(const QQuickWebView);
+    return d->userScriptsForAllFrames;
+}
+
+void QQuickWebViewExperimental::setUserScriptsForAllFrames(bool forAllFrames)
+{
+    Q_D(QQuickWebView);
+    d->userScriptsForAllFrames = forAllFrames;
+    d->updateUserScripts();
+    emit userScriptsForAllFramesChanged();
 }
 
 QUrl QQuickWebViewExperimental::remoteInspectorUrl() const
