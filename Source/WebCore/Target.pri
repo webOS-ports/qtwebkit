@@ -3536,6 +3536,16 @@ enable?(WEB_AUDIO) {
     }
 }
 
+enable?(PALM_SERVICE_BRIDGE) {
+    INCLUDEPATH += $$PWD/platform/webos
+    SOURCES += \
+        platform/webos/PalmServiceBridge.cpp \
+        platform/webos/LunaServiceMgr.cpp
+    HEADERS += \
+        platform/webos/PalmServiceBridge.h \
+        platform/webos/LunaServiceMgr.h
+}
+
 enable?(FULLSCREEN_API) {
     SOURCES += \
         rendering/RenderFullScreen.cpp

@@ -253,6 +253,10 @@ enable?(opencl) {
     INCLUDEPATH += $$SOURCE_DIR/platform/graphics/gpu/opencl
 }
 
+enable?(PALM_SERVICE_BRIDGE) {
+    PKGCONFIG += luna-service2
+}
+
 mac {
     LIBS += -framework Carbon -framework AppKit -framework IOKit
 }
