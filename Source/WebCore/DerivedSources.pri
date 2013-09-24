@@ -680,6 +680,10 @@ enable?(MEDIA_SOURCE) {
     $$PWD/Modules/mediasource/SourceBufferList.idl
 }
 
+enable?(PALM_SERVICE_BRIDGE) {
+  IDL_BINDINGS += $$PWD/platform/webos/PalmServiceBridge.idl
+}
+
 qtPrepareTool(QMAKE_MOC, moc)
 
 mathmlnames.output = MathMLNames.cpp
