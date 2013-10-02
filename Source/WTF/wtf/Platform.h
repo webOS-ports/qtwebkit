@@ -743,6 +743,9 @@
 #define ENABLE_LLINT 1
 #endif
 
+#undef ENABLE_LLINT
+#define ENABLE_LLINT 0
+
 #if !defined(ENABLE_DFG_JIT) && ENABLE(JIT) && !COMPILER(MSVC)
 /* Enable the DFG JIT on X86 and X86_64.  Only tested on Mac and GNU/Linux. */
 #if (CPU(X86) || CPU(X86_64)) && (OS(DARWIN) || OS(LINUX))
