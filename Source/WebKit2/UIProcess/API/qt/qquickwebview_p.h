@@ -33,6 +33,7 @@ class QQmlComponent;
 class QQmlWebChannel;
 QT_END_NAMESPACE
 class QWebNavigationRequest;
+class QWebNewPageRequest;
 class QQuickWebPage;
 class QQuickWebViewAttached;
 class QWebLoadRequest;
@@ -416,6 +417,10 @@ Q_SIGNALS:
 #ifdef HAVE_WEBCHANNEL
     void webChannelChanged(QQmlWebChannel* channel);
 #endif
+
+    void createNewPage(QWebNewPageRequest *request);
+    void showPage();
+    void closePage();
 
 private:
     QQuickWebViewExperimental(QQuickWebView* webView, QQuickWebViewPrivate* webViewPrivate);
