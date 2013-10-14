@@ -23,6 +23,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QUrl>
+#include <QtCore/QVariantMap>
 #include <WKFrame.h>
 #include <WKGeolocationPermissionRequest.h>
 #include <WKPage.h>
@@ -50,6 +51,10 @@ private:
     void runOpenPanel(WKOpenPanelResultListenerRef, const QStringList& selectedFileNames, FileChooserType);
     void mouseDidMoveOverElement(const QUrl& linkURL, const QString& linkTitle);
     void permissionRequest(QWebPermissionRequest*);
+    WKPageRef createNewPage(const QUrl& url, const QVariantMap& windowFeatures,
+                            Qt::KeyboardModifiers modifiers, Qt::MouseButton mouseButtons);
+    void showPage();
+    void closePage();
 
     // WKPageUIClient callbacks.
     static void runJavaScriptAlert(WKPageRef, WKStringRef alertText, WKFrameRef, const void* clientInfo);
@@ -60,6 +65,9 @@ private:
     static unsigned long long exceededDatabaseQuota(WKPageRef, WKFrameRef, WKSecurityOriginRef, WKStringRef databaseName, WKStringRef displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage, const void *clientInfo);
     static void policyForGeolocationPermissionRequest(WKPageRef, WKFrameRef, WKSecurityOriginRef, WKGeolocationPermissionRequestRef, const void*);
     static void policyForNotificationPermissionRequest(WKPageRef, WKSecurityOriginRef, WKNotificationPermissionRequestRef, const void*);
+    static WKPageRef createNewPage(WKPageRef page, WKURLRequestRef request, WKDictionaryRef wkWindowFeatures, WKEventModifiers modifiers, WKEventMouseButton mouseButton, const void *clientInfo);
+    static void showPage(WKPageRef page, const void *clientInfo);
+    static void closePage(WKPageRef page, const void *clientInfo);
 
     QQuickWebView* m_webView;
     QUrl m_lastHoveredURL;
