@@ -26,11 +26,16 @@
 #include "qquickwebview_p.h"
 #include "qquickwebview_p_p.h"
 #include "qwebpermissionrequest_p.h"
+#include "qwebnewpagerequest_p.h"
 #include <WKArray.h>
 #include <WKHitTestResult.h>
 #include <WKOpenPanelParameters.h>
 #include <WKOpenPanelResultListener.h>
 #include <WKRetainPtr.h>
+#include <WKURLRequest.h>
+#include "WKDictionary.h"
+#include "WKNumber.h"
+#include "WKString.h"
 
 namespace WebKit {
 
@@ -49,6 +54,9 @@ QtWebPageUIClient::QtWebPageUIClient(WKPageRef pageRef, QQuickWebView* webView)
     uiClient.exceededDatabaseQuota = exceededDatabaseQuota;
     uiClient.decidePolicyForGeolocationPermissionRequest = policyForGeolocationPermissionRequest;
     uiClient.decidePolicyForNotificationPermissionRequest = policyForNotificationPermissionRequest;
+    uiClient.createNewPage = createNewPage;
+    uiClient.showPage = showPage;
+    uiClient.close = closePage;
     WKPageSetPageUIClient(pageRef, &uiClient);
 }
 
@@ -90,6 +98,30 @@ void QtWebPageUIClient::permissionRequest(QWebPermissionRequest* request)
 {
     request->setParent(m_webView);
     emit m_webView->experimental()->permissionRequested(request);
+}
+
+WKPageRef QtWebPageUIClient::createNewPage(const QUrl& url, const QVariantMap& windowFeatures,
+                            Qt::KeyboardModifiers modifiers, Qt::MouseButton mouseButtons)
+{
+    QWebNewPageRequest request(url, windowFeatures, modifiers, mouseButtons);
+
+    emit m_webView->experimental()->createNewPage(&request);
+
+    QQuickWebView *newWebView = request.webView();
+    if (newWebView != 0)
+        return static_cast<WKPageRef>(WKRetain(newWebView->pageRef()));
+
+    return 0;
+}
+
+void QtWebPageUIClient::showPage()
+{
+    emit m_webView->experimental()->showPage();
+}
+
+void QtWebPageUIClient::closePage()
+{
+    emit m_webView->experimental()->closePage();
 }
 
 static QtWebPageUIClient* toQtWebPageUIClient(const void* clientInfo)
@@ -171,6 +203,76 @@ void QtWebPageUIClient::policyForNotificationPermissionRequest(WKPageRef page, W
 
     QWebPermissionRequest* req = QWebPermissionRequest::create(origin, request);
     toQtWebPageUIClient(clientInfo)->permissionRequest(req);
+}
+
+static Qt::MouseButton toQtMouseButton(WKEventMouseButton button)
+{
+    switch (button) {
+    case kWKEventMouseButtonLeftButton:
+        return Qt::LeftButton;
+    case kWKEventMouseButtonMiddleButton:
+        return Qt::MiddleButton;
+    case kWKEventMouseButtonRightButton:
+        return Qt::RightButton;
+    case kWKEventMouseButtonNoButton:
+        return Qt::NoButton;
+    }
+    ASSERT_NOT_REACHED();
+    return Qt::NoButton;
+}
+
+static Qt::KeyboardModifiers toQtKeyboardModifiers(WKEventModifiers modifiers)
+{
+    Qt::KeyboardModifiers qtModifiers = Qt::NoModifier;
+    if (modifiers & kWKEventModifiersShiftKey)
+        qtModifiers |= Qt::ShiftModifier;
+    if (modifiers & kWKEventModifiersControlKey)
+        qtModifiers |= Qt::ControlModifier;
+    if (modifiers & kWKEventModifiersAltKey)
+        qtModifiers |= Qt::AltModifier;
+    if (modifiers & kWKEventModifiersMetaKey)
+        qtModifiers |= Qt::MetaModifier;
+    return qtModifiers;
+}
+
+WKPageRef QtWebPageUIClient::createNewPage(WKPageRef page, WKURLRequestRef request, WKDictionaryRef wkWindowFeatures, WKEventModifiers modifiers, WKEventMouseButton mouseButton, const void *clientInfo)
+{
+    WKRetainPtr<WKURLRef> requestURL(AdoptWK, WKURLRequestCopyURL(request));
+    QUrl qUrl = WKURLCopyQUrl(requestURL.get());
+
+    QVariantMap windowFeatures;
+
+    WKArrayRef keys = WKDictionaryCopyKeys(wkWindowFeatures);
+    for (int n = 0; n < WKArrayGetSize(keys); n++) {
+        WKStringRef key = static_cast<WKStringRef>(WKArrayGetItemAtIndex(keys, n));
+        WKTypeRef value = WKDictionaryGetItemForKey(wkWindowFeatures, key);
+        QString keyStr = WKStringCopyQString(key);
+        if (WKGetTypeID(value) == WKDoubleGetTypeID()) {
+            double doubleValue = WKDoubleGetValue(static_cast<WKDoubleRef>(value));
+            windowFeatures.insert(keyStr, QVariant(doubleValue));
+        }
+        else if (WKGetTypeID(value) == WKBooleanGetTypeID()) {
+            bool booleanValue = WKBooleanGetValue(static_cast<WKBooleanRef>(value));
+            windowFeatures.insert(keyStr, QVariant(booleanValue));
+        }
+        else if (WKGetTypeID(value) == WKStringGetTypeID()) {
+            QString stringValue = WKStringCopyQString(static_cast<WKStringRef>(value));
+            windowFeatures.insert(keyStr, QVariant(stringValue));
+        }
+    }
+
+    return toQtWebPageUIClient(clientInfo)->createNewPage(qUrl, windowFeatures,
+        toQtKeyboardModifiers(modifiers), toQtMouseButton(mouseButton));
+}
+
+void QtWebPageUIClient::showPage(WKPageRef page, const void *clientInfo)
+{
+    toQtWebPageUIClient(clientInfo)->showPage();
+}
+
+void QtWebPageUIClient::closePage(WKPageRef page, const void *clientInfo)
+{
+    toQtWebPageUIClient(clientInfo)->closePage();
 }
 
 } // namespace WebKit
