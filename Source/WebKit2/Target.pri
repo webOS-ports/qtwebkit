@@ -791,6 +791,7 @@ have?(QTQUICK) {
         UIProcess/API/qt/qtwebsecurityorigin_p.h \
         UIProcess/API/qt/qwebloadrequest_p.h \
         UIProcess/API/qt/qwebnavigationrequest_p.h \
+        UIProcess/API/qt/qwebnewpagerequest_p.h \
         UIProcess/API/qt/qquickwebpage_p.h \
         UIProcess/API/qt/qquickwebpage_p_p.h \
         UIProcess/API/qt/qwebnavigationhistory_p.h \
@@ -826,6 +827,7 @@ have?(QTQUICK) {
         UIProcess/API/qt/qtwebsecurityorigin.cpp \
         UIProcess/API/qt/qwebloadrequest.cpp \
         UIProcess/API/qt/qwebnavigationrequest.cpp \
+        UIProcess/API/qt/qwebnewpagerequest.cpp \
         UIProcess/API/qt/qquickwebpage.cpp \
         UIProcess/API/qt/qwebnavigationhistory.cpp \
         UIProcess/API/qt/qquickwebview.cpp \
