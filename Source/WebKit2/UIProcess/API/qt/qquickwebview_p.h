@@ -32,6 +32,7 @@ QT_BEGIN_NAMESPACE
 class QQmlComponent;
 QT_END_NAMESPACE
 class QWebNavigationRequest;
+class QWebNewPageRequest;
 class QQuickWebPage;
 class QQuickWebViewAttached;
 class QWebLoadRequest;
@@ -401,6 +402,10 @@ Q_SIGNALS:
     void didRelaunchProcess();
     void processDidBecomeUnresponsive();
     void processDidBecomeResponsive();
+
+    void createNewPage(QWebNewPageRequest *request);
+    void showPage();
+    void closePage();
 
 private:
     QQuickWebViewExperimental(QQuickWebView* webView, QQuickWebViewPrivate* webViewPrivate);
