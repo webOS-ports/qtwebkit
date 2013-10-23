@@ -61,6 +61,8 @@ public:
     Q_PROPERTY(unsigned defaultFontSize READ defaultFontSize WRITE setDefaultFontSize NOTIFY defaultFontSizeChanged FINAL)
     Q_PROPERTY(unsigned defaultFixedFontSize READ defaultFixedFontSize WRITE setDefaultFixedFontSize NOTIFY defaultFixedFontSizeChanged FINAL)
 
+    Q_PROPERTY(bool logsPageMessagesToSystemConsole READ logsPageMessagesToSystemConsole WRITE setLogsPageMessagesToSystemConsole NOTIFY logsPageMessagesToSystemConsoleChanged FINAL)
+
     bool autoLoadImages() const;
     void setAutoLoadImages(bool enable);
 
@@ -142,6 +144,9 @@ public:
     unsigned defaultFixedFontSize() const;
     void setDefaultFixedFontSize(unsigned size);
 
+    bool logsPageMessagesToSystemConsole() const;
+    void setLogsPageMessagesToSystemConsole(bool enabled);
+
 Q_SIGNALS:
     void autoLoadImagesChanged();
     void pluginsEnabledChanged();
@@ -172,6 +177,8 @@ Q_SIGNALS:
     void minimumFontSizeChanged();
     void defaultFontSizeChanged();
     void defaultFixedFontSizeChanged();
+
+    void logsPageMessagesToSystemConsoleChanged();
 
 private:
     Q_DISABLE_COPY(QWebPreferences)
