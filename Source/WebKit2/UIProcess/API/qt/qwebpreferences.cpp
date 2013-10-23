@@ -24,6 +24,7 @@
 #include "qwebpreferences_p_p.h"
 #include <WKPageGroup.h>
 #include <WKPreferences.h>
+#include <WKPreferencesPrivate.h>
 #include <WKRetainPtr.h>
 #include <WKStringQt.h>
 
@@ -83,6 +84,8 @@ bool QWebPreferencesPrivate::testAttribute(QWebPreferencesPrivate::WebAttribute 
         return WKPreferencesGetUniversalAccessFromFileURLsAllowed(preferencesRef);
     case FileAccessFromFileURLsAllowed:
         return WKPreferencesGetFileAccessFromFileURLsAllowed(preferencesRef);
+    case LogsPageMessagesToSystemConsoleEnabled:
+        return WKPreferencesGetLogsPageMessagesToSystemConsoleEnabled(preferencesRef);
     default:
         ASSERT_NOT_REACHED();
         return false;
@@ -154,6 +157,9 @@ void QWebPreferencesPrivate::setAttribute(QWebPreferencesPrivate::WebAttribute a
         break;
     case FileAccessFromFileURLsAllowed:
         WKPreferencesSetFileAccessFromFileURLsAllowed(preferencesRef, enable);
+        break;
+    case LogsPageMessagesToSystemConsoleEnabled:
+        WKPreferencesSetLogsPageMessagesToSystemConsoleEnabled(preferencesRef, enable);
         break;
     default:
         ASSERT_NOT_REACHED();
@@ -602,6 +608,19 @@ void QWebPreferences::setFileAccessFromFileURLsAllowed(bool enable)
         return;
     d->setAttribute(QWebPreferencesPrivate::FileAccessFromFileURLsAllowed, enable);
     emit fileAccessFromFileURLsAllowedChanged();
+}
+
+bool QWebPreferences::logsPageMessagesToSystemConsole() const
+{
+    return d->testAttribute(QWebPreferencesPrivate::LogsPageMessagesToSystemConsoleEnabled);
+}
+
+void QWebPreferences::setLogsPageMessagesToSystemConsole(bool enable)
+{
+    if (logsPageMessagesToSystemConsole() == enable)
+        return;
+    d->setAttribute(QWebPreferencesPrivate::LogsPageMessagesToSystemConsoleEnabled, enable);
+    emit logsPageMessagesToSystemConsoleChanged();
 }
 
 QWebPreferencesPrivate* QWebPreferencesPrivate::get(QWebPreferences* preferences)
