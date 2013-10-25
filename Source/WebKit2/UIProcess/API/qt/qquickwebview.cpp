@@ -980,6 +980,18 @@ void QQuickWebViewPrivate::didReceiveMessageFromNavigatorQtWebChannelTransportOb
 }
 #endif
 
+WKTypeRef QQuickWebViewPrivate::didReceiveSyncMessageFromNavigatorQtObject(WKStringRef message)
+{
+    QVariantMap variantMap;
+    variantMap.insert(QLatin1String("data"), WKStringCopyQString(message));
+    variantMap.insert(QLatin1String("origin"), q_ptr->url());
+
+    QString response("{}");
+    emit q_ptr->experimental()->syncMessageReceived(variantMap, response);
+
+    return WKStringCreateWithQString(response);
+}
+
 CoordinatedGraphicsScene* QQuickWebViewPrivate::coordinatedGraphicsScene()
 {
     if (webPageProxy && webPageProxy->drawingArea() && webPageProxy->drawingArea()->coordinatedLayerTreeHostProxy())
