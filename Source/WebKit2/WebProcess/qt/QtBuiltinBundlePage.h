@@ -50,6 +50,8 @@ public:
     void postMessageFromNavigatorQtObject(WKStringRef message);
     void didReceiveMessageToNavigatorQtObject(WKStringRef message);
 
+    WKTypeRef postSyncMessageFromNavigatorQtObject(WKStringRef message);
+
     bool navigatorQtObjectEnabled() const { return m_navigatorQtObjectEnabled; }
     void setNavigatorQtObjectEnabled(bool);
 

@@ -385,6 +385,7 @@ Q_SIGNALS:
     void downloadRequested(QWebDownloadItem* downloadItem);
     void permissionRequested(QWebPermissionRequest* permission);
     void messageReceived(const QVariantMap& message);
+    void syncMessageReceived(const QVariantMap& message, QString& response);
     void proxyAuthenticationDialogChanged();
     void userAgentChanged();
     void deviceWidthChanged();

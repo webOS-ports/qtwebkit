@@ -137,6 +137,7 @@ public:
     void handleDownloadRequest(WebKit::DownloadProxy*);
 
     void didReceiveMessageFromNavigatorQtObject(WKStringRef message);
+    WKTypeRef didReceiveSyncMessageFromNavigatorQtObject(WKStringRef message);
 
     WebCore::CoordinatedGraphicsScene* coordinatedGraphicsScene();
     float deviceScaleFactor();
