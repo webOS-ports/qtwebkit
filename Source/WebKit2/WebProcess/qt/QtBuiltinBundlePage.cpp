@@ -120,6 +120,26 @@ static JSValueRef qt_postMessageCallback(JSContextRef context, JSObjectRef, JSOb
     return JSValueMakeUndefined(context);
 }
 
+static JSValueRef qt_postSyncMessageCallback(JSContextRef context, JSObjectRef, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef*)
+{
+    if (argumentCount < 1 || !JSValueIsString(context, arguments[0]))
+        return JSValueMakeUndefined(context);
+
+    QtBuiltinBundlePage* bundlePage = reinterpret_cast<QtBuiltinBundlePage*>(JSObjectGetPrivate(thisObject));
+    ASSERT(bundlePage);
+
+    // FIXME: needed?
+    if (!bundlePage->navigatorQtObjectEnabled())
+        return JSValueMakeUndefined(context);
+
+    JSRetainPtr<JSStringRef> jsContents = JSValueToStringCopy(context, arguments[0], 0);
+    WKRetainPtr<WKStringRef> contents(AdoptWK, WKStringCreateWithJSString(jsContents.get()));
+    WKTypeRef returnData = bundlePage->postSyncMessageFromNavigatorQtObject(contents.get());
+
+    JSRetainPtr<JSStringRef> jsData = WKStringCopyJSString(static_cast<WKStringRef>(returnData));
+    return JSValueMakeString(context, jsData.get());
+}
+
 void QtBuiltinBundlePage::didClearWindowForFrame(WKBundleFrameRef frame, WKBundleScriptWorldRef world)
 {
     if (!WKBundleFrameIsMainFrame(frame) || WKBundleScriptWorldNormalWorld() != world)
@@ -134,6 +154,17 @@ void QtBuiltinBundlePage::postMessageFromNavigatorQtObject(WKStringRef contents)
     WKTypeRef body[] = { page(), contents };
     WKRetainPtr<WKArrayRef> messageBody(AdoptWK, WKArrayCreate(body, sizeof(body) / sizeof(WKTypeRef)));
     WKBundlePostMessage(m_bundle->toRef(), messageName, messageBody.get());
+}
+
+WKTypeRef QtBuiltinBundlePage::postSyncMessageFromNavigatorQtObject(WKStringRef contents)
+{
+    static WKStringRef messageName = WKStringCreateWithUTF8CString("SyncMessageFromNavigatorQtObject");
+    WKTypeRef body[] = { page(), contents };
+    WKRetainPtr<WKArrayRef> messageBody(AdoptWK, WKArrayCreate(body, sizeof(body) / sizeof(WKTypeRef)));
+
+    WKTypeRef returnData;
+    WKBundlePostSynchronousMessage(m_bundle->toRef(), messageName, messageBody.get(), &returnData);
+    return returnData;
 }
 
 static JSObjectRef createWrappedMessage(JSGlobalContextRef context, WKStringRef data)
@@ -179,6 +210,7 @@ void QtBuiltinBundlePage::setNavigatorQtObjectEnabled(bool enabled)
 void QtBuiltinBundlePage::registerNavigatorQtObject(JSGlobalContextRef context)
 {
     static JSStringRef postMessageName = JSStringCreateWithUTF8CString("postMessage");
+    static JSStringRef postSyncMessageName = JSStringCreateWithUTF8CString("postSyncMessage");
     static JSStringRef navigatorName = JSStringCreateWithUTF8CString("navigator");
     static JSStringRef qtName = JSStringCreateWithUTF8CString("qt");
 
@@ -189,6 +221,8 @@ void QtBuiltinBundlePage::registerNavigatorQtObject(JSGlobalContextRef context)
 
     JSObjectRef postMessage = JSObjectMakeFunctionWithCallback(context, postMessageName, qt_postMessageCallback);
     JSObjectSetProperty(context, m_navigatorQtObject, postMessageName, postMessage, kJSPropertyAttributeDontDelete | kJSPropertyAttributeReadOnly, 0);
+    JSObjectRef postSyncMessage = JSObjectMakeFunctionWithCallback(context, postSyncMessageName, qt_postSyncMessageCallback);
+    JSObjectSetProperty(context, m_navigatorQtObject, postSyncMessageName, postSyncMessage, kJSPropertyAttributeDontDelete | kJSPropertyAttributeReadOnly, 0);
 
     JSValueRef navigatorValue = JSObjectGetProperty(context, JSContextGetGlobalObject(context), navigatorName, 0);
     if (!JSValueIsObject(context, navigatorValue))
