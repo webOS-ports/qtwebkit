@@ -141,6 +141,7 @@ public:
 #ifdef HAVE_WEBCHANNEL
     void didReceiveMessageFromNavigatorQtWebChannelTransportObject(WKStringRef message);
 #endif
+    WKTypeRef didReceiveSyncMessageFromNavigatorQtObject(WKStringRef message);
 
     WebCore::CoordinatedGraphicsScene* coordinatedGraphicsScene();
     float deviceScaleFactor();
