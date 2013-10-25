@@ -106,12 +106,32 @@ static void didReceiveMessageFromInjectedBundle(WKContextRef, WKStringRef messag
     QQuickWebViewPrivate::get(page)->didReceiveMessageFromNavigatorQtObject(str);
 }
 
+static void didReceiveSynchronousMessageFromInjectedBundle(WKContextRef, WKStringRef messageName, WKTypeRef messageBody, WKTypeRef *returnData, const void*)
+{
+    if (!WKStringIsEqualToUTF8CString(messageName, "SyncMessageFromNavigatorQtObject"))
+        return;
+
+    ASSERT(messageBody);
+    ASSERT(WKGetTypeID(messageBody) == WKArrayGetTypeID());
+
+    WKArrayRef body = static_cast<WKArrayRef>(messageBody);
+    ASSERT(WKArrayGetSize(body) == 2);
+    ASSERT(WKGetTypeID(WKArrayGetItemAtIndex(body, 0)) == WKPageGetTypeID());
+    ASSERT(WKGetTypeID(WKArrayGetItemAtIndex(body, 1)) == WKStringGetTypeID());
+
+    WKPageRef page = static_cast<WKPageRef>(WKArrayGetItemAtIndex(body, 0));
+    WKStringRef str = static_cast<WKStringRef>(WKArrayGetItemAtIndex(body, 1));
+
+    *returnData = QQuickWebViewPrivate::get(page)->didReceiveSyncMessageFromNavigatorQtObject(str);
+}
+
 static void initializeContextInjectedBundleClient(WKContextRef context)
 {
     WKContextInjectedBundleClient injectedBundleClient;
     memset(&injectedBundleClient, 0, sizeof(WKContextInjectedBundleClient));
     injectedBundleClient.version = kWKContextInjectedBundleClientCurrentVersion;
     injectedBundleClient.didReceiveMessageFromInjectedBundle = didReceiveMessageFromInjectedBundle;
+    injectedBundleClient.didReceiveSynchronousMessageFromInjectedBundle = didReceiveSynchronousMessageFromInjectedBundle;
     WKContextSetInjectedBundleClient(context, &injectedBundleClient);
 }
 
