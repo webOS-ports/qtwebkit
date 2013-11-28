@@ -86,6 +86,8 @@ bool QWebPreferencesPrivate::testAttribute(QWebPreferencesPrivate::WebAttribute 
         return WKPreferencesGetFileAccessFromFileURLsAllowed(preferencesRef);
     case LogsPageMessagesToSystemConsoleEnabled:
         return WKPreferencesGetLogsPageMessagesToSystemConsoleEnabled(preferencesRef);
+    case Privileged:
+        return WKPreferencesGetPrivileged(preferencesRef);
     default:
         ASSERT_NOT_REACHED();
         return false;
@@ -160,6 +162,9 @@ void QWebPreferencesPrivate::setAttribute(QWebPreferencesPrivate::WebAttribute a
         break;
     case LogsPageMessagesToSystemConsoleEnabled:
         WKPreferencesSetLogsPageMessagesToSystemConsoleEnabled(preferencesRef, enable);
+        break;
+    case Privileged:
+        WKPreferencesSetPrivileged(preferencesRef, enable);
         break;
     default:
         ASSERT_NOT_REACHED();
@@ -621,6 +626,19 @@ void QWebPreferences::setLogsPageMessagesToSystemConsole(bool enable)
         return;
     d->setAttribute(QWebPreferencesPrivate::LogsPageMessagesToSystemConsoleEnabled, enable);
     emit logsPageMessagesToSystemConsoleChanged();
+}
+
+bool QWebPreferences::privileged() const
+{
+    return d->testAttribute(QWebPreferencesPrivate::Privileged);
+}
+
+void QWebPreferences::setPrivileged(bool value)
+{
+    if (privileged() == value)
+        return;
+    d->setAttribute(QWebPreferencesPrivate::Privileged, value);
+    emit privilegedChanged();
 }
 
 QWebPreferencesPrivate* QWebPreferencesPrivate::get(QWebPreferences* preferences)
