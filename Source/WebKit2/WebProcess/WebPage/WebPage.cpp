@@ -2594,6 +2594,8 @@ void WebPage::updatePreferences(const WebPreferencesStore& store)
 
     settings->setLowPowerVideoAudioBufferSizeEnabled(store.getBoolValueForKey(WebPreferencesKey::lowPowerVideoAudioBufferSizeEnabledKey()));
 
+    settings->setPrivileged(store.getBoolValueForKey(WebPreferencesKey::privilegedKey()));
+
     platformPreferencesDidChange(store);
 
     if (m_drawingArea)

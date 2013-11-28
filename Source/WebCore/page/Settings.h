@@ -261,6 +261,9 @@ namespace WebCore {
         static bool lowPowerVideoAudioBufferSizeEnabled() { return gLowPowerVideoAudioBufferSizeEnabled; }
         static void setLowPowerVideoAudioBufferSizeEnabled(bool);
 
+        void setPrivileged(bool);
+        bool privileged() { return m_privileged; }
+
     private:
         explicit Settings(Page*);
 
@@ -343,6 +346,8 @@ namespace WebCore {
         static double gHiddenPageDOMTimerAlignmentInterval;
 
         static bool gLowPowerVideoAudioBufferSizeEnabled;
+
+        bool m_privileged;
     };
 
 } // namespace WebCore
