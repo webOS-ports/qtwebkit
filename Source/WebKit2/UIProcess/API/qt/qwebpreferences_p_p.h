@@ -44,7 +44,8 @@ public:
         NotificationsEnabled,
         UniversalAccessFromFileURLsAllowed,
         FileAccessFromFileURLsAllowed,
-        LogsPageMessagesToSystemConsoleEnabled
+        LogsPageMessagesToSystemConsoleEnabled,
+        Privileged
     };
 
     enum FontFamily {
