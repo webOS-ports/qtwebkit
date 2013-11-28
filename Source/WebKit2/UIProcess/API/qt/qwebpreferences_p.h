@@ -63,6 +63,8 @@ public:
 
     Q_PROPERTY(bool logsPageMessagesToSystemConsole READ logsPageMessagesToSystemConsole WRITE setLogsPageMessagesToSystemConsole NOTIFY logsPageMessagesToSystemConsoleChanged FINAL)
 
+    Q_PROPERTY(bool privileged READ privileged WRITE setPrivileged NOTIFY privilegedChanged FINAL)
+
     bool autoLoadImages() const;
     void setAutoLoadImages(bool enable);
 
@@ -147,6 +149,9 @@ public:
     bool logsPageMessagesToSystemConsole() const;
     void setLogsPageMessagesToSystemConsole(bool enabled);
 
+    bool privileged() const;
+    void setPrivileged(bool value);
+
 Q_SIGNALS:
     void autoLoadImagesChanged();
     void pluginsEnabledChanged();
@@ -179,6 +184,8 @@ Q_SIGNALS:
     void defaultFixedFontSizeChanged();
 
     void logsPageMessagesToSystemConsoleChanged();
+
+    void privilegedChanged();
 
 private:
     Q_DISABLE_COPY(QWebPreferences)
