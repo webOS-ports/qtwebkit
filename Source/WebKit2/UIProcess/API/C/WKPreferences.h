@@ -240,6 +240,11 @@ WK_EXPORT bool WKPreferencesGetQTKitEnabled(WKPreferencesRef preferencesRef);
 WK_EXPORT void WKPreferencesSetAsynchronousSpellCheckingEnabled(WKPreferencesRef preferencesRef, bool enabled);
 WK_EXPORT bool WKPreferencesGetAsynchronousSpellCheckingEnabled(WKPreferencesRef preferencesRef);
 
+// Defaults to false
+WK_EXPORT bool WKPreferencesGetPrivileged(WKPreferencesRef preferencesRef);
+WK_EXPORT void WKPreferencesSetPrivileged(WKPreferencesRef preferencesRef, bool privileged);
+
+
 #ifdef __cplusplus
 }
 #endif

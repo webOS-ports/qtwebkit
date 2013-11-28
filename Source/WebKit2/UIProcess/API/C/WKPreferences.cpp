@@ -1144,3 +1144,13 @@ double WKPreferencesGetIncrementalRenderingSuppressionTimeout(WKPreferencesRef p
 {
     return toAPI(toImpl(preferencesRef)->incrementalRenderingSuppressionTimeout());
 }
+
+bool WKPreferencesGetPrivileged(WKPreferencesRef preferencesRef)
+{
+    return toImpl(preferencesRef)->privileged();
+}
+
+void WKPreferencesSetPrivileged(WKPreferencesRef preferencesRef, bool privileged)
+{
+    toImpl(preferencesRef)->setPrivileged(privileged);
+}
