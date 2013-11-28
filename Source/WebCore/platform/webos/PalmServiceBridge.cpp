@@ -10,6 +10,7 @@
 #include "Frame.h"
 #include "Logging.h"
 #include "Page.h"
+#include "Settings.h"
 #include <wtf/text/WTFString.h>
 #include "ScriptController.h"
 #include <wtf/RefCountedLeakCounter.h>
@@ -117,22 +118,8 @@ PalmServiceBridge::PalmServiceBridge(ScriptExecutionContext* context, bool subsc
     serviceBridgeCounter.increment();
 #endif
 
-    JSValue identifier;
-    ExecState* exec = 0;
-    Frame *frame = document()->frame();
-    if (frame) {
-        identifier = frame->script()->executeScript(ScriptSourceCode("PalmSystem && PalmSystem.getIdentifier()")).jsValue();
-        JSGlobalObject* globalObject = frame->script()->bindingRootObject()->globalObject();
-        exec = globalObject->globalExec();
-
-        m_identifier = strdup(identifier.toString(exec)->value(exec).utf8().data());
-
-        /* check for privileged bus names */
-        if (strncmp(m_identifier, "com.palm", 8) == 0 ||
-            strncmp(m_identifier, "com.webos", 9) == 0 ||
-            strncmp(m_identifier, "org.webosports", 14) == 0)
-            m_isPrivileged = true;
-    }
+    if (document()->page() != 0)
+        m_isPrivileged = document()->page()->settings()->privileged();
 }
 
 bool PalmServiceBridge::init(Document* d, bool subscribe)
