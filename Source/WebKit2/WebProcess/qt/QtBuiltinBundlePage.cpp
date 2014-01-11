@@ -142,8 +142,10 @@ static JSValueRef qt_postSyncMessageCallback(JSContextRef context, JSObjectRef, 
 
 void QtBuiltinBundlePage::didClearWindowForFrame(WKBundleFrameRef frame, WKBundleScriptWorldRef world)
 {
+#if 0
     if (!WKBundleFrameIsMainFrame(frame) || WKBundleScriptWorldNormalWorld() != world)
         return;
+#endif
     JSGlobalContextRef context = WKBundleFrameGetJavaScriptContextForWorld(frame, world);
     registerNavigatorQtObject(context);
 }
