@@ -67,7 +67,8 @@ String UserAgentQt::standardUserAgent(const String &applicationNameForUserAgent,
 #elif OS(WINDOWS)
             ""
 #else
-            (QGuiApplication::platformName() == QLatin1String("xcb")) ? "X11; " : "Unknown; "
+            //(QGuiApplication::platformName() == QLatin1String("xcb")) ? "X11; " : "Unknown; "
+            "WebAppManager"
 #endif
         ));
 
