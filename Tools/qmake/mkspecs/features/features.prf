@@ -166,8 +166,8 @@ defineTest(santizeFeatures) {
     # Web Audio requires GStreamer.
     !use?(gstreamer): WEBKIT_CONFIG -= web_audio
 
-    # GStreamer uses Glib
-    use?(gstreamer): WEBKIT_CONFIG += use_glib
+    # Always use glib in our case (webOS)
+    WEBKIT_CONFIG += use_glib
 
     # VideoTrack requires video
     !enable?(video): WEBKIT_CONFIG -= video_track
