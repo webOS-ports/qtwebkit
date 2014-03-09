@@ -363,6 +363,8 @@ public:
     void setRenderToOffscreenBuffer(bool enable);
     static void setFlickableViewportEnabled(bool enable);
     static bool flickableViewportEnabled();
+    void suspendActiveDOMObjectsAndAnimations();
+    void resumeActiveDOMObjectsAndAnimations();
 
 public Q_SLOTS:
     void goBackTo(int index);
