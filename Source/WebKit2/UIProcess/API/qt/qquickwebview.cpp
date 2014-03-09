@@ -1681,6 +1681,16 @@ QQuickWebPage* QQuickWebViewExperimental::page()
     return q_ptr->page();
 }
 
+void QQuickWebViewExperimental::suspendActiveDOMObjectsAndAnimations()
+{
+    toImpl(q_ptr->pageRef())->suspendActiveDOMObjectsAndAnimations();
+}
+
+void QQuickWebViewExperimental::resumeActiveDOMObjectsAndAnimations()
+{
+    toImpl(q_ptr->pageRef())->resumeActiveDOMObjectsAndAnimations();
+}
+
 /*!
     \page qtwebkit-index.html
     \title Qt WebKit
