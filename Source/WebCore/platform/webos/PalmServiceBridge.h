@@ -67,7 +67,7 @@ class PalmServiceBridge : public RefCounted<PalmServiceBridge>,
         bool m_canceled;
         bool m_subscribed;
         bool m_inServiceCallback;
-        const char *m_identifier;
+        char *m_identifier;
         bool m_isPrivileged;
 
         PalmServiceBridge(ScriptExecutionContext*, bool);
