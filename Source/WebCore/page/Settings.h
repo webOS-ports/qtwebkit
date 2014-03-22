@@ -264,6 +264,9 @@ namespace WebCore {
         void setPrivileged(bool);
         bool privileged() { return m_privileged; }
 
+        void setIdentifier(const String&);
+        String identifier() const { return m_identifier; }
+
     private:
         explicit Settings(Page*);
 
@@ -348,6 +351,8 @@ namespace WebCore {
         static bool gLowPowerVideoAudioBufferSizeEnabled;
 
         bool m_privileged;
+
+        String m_identifier;
     };
 
 } // namespace WebCore
