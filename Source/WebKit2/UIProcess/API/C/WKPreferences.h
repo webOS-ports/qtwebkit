@@ -244,6 +244,9 @@ WK_EXPORT bool WKPreferencesGetAsynchronousSpellCheckingEnabled(WKPreferencesRef
 WK_EXPORT bool WKPreferencesGetPrivileged(WKPreferencesRef preferencesRef);
 WK_EXPORT void WKPreferencesSetPrivileged(WKPreferencesRef preferencesRef, bool privileged);
 
+// Defaults to ""
+WK_EXPORT void WKPreferencesSetIdentifier(WKPreferencesRef preferencesRef, WKStringRef identifier);
+WK_EXPORT WKStringRef WKPreferencesCopyIdentifier(WKPreferencesRef preferencesRef);
 
 #ifdef __cplusplus
 }
