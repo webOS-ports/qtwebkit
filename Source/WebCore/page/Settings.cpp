@@ -170,6 +170,7 @@ Settings::Settings(Page* page)
     , m_hiddenPageCSSAnimationSuspensionEnabled(false)
 #endif
     , m_privileged(false)
+    , m_identifier("")
 {
     // A Frame may not have been created yet, so we initialize the AtomicString
     // hash before trying to use it.
@@ -621,6 +622,11 @@ void Settings::setLowPowerVideoAudioBufferSizeEnabled(bool flag)
 void Settings::setPrivileged(bool flag)
 {
     m_privileged = flag;
+}
+
+void Settings::setIdentifier(const String& identifier)
+{
+    m_identifier = identifier;
 }
 
 
