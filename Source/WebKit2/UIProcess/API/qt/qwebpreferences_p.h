@@ -64,6 +64,7 @@ public:
     Q_PROPERTY(bool logsPageMessagesToSystemConsole READ logsPageMessagesToSystemConsole WRITE setLogsPageMessagesToSystemConsole NOTIFY logsPageMessagesToSystemConsoleChanged FINAL)
 
     Q_PROPERTY(bool privileged READ privileged WRITE setPrivileged NOTIFY privilegedChanged FINAL)
+    Q_PROPERTY(QString identifier READ identifier WRITE setIdentifier NOTIFY identifierChanged FINAL)
 
     bool autoLoadImages() const;
     void setAutoLoadImages(bool enable);
@@ -152,6 +153,9 @@ public:
     bool privileged() const;
     void setPrivileged(bool value);
 
+    QString identifier() const;
+    void setIdentifier(const QString& identifier);
+
 Q_SIGNALS:
     void autoLoadImagesChanged();
     void pluginsEnabledChanged();
@@ -186,6 +190,7 @@ Q_SIGNALS:
     void logsPageMessagesToSystemConsoleChanged();
 
     void privilegedChanged();
+    void identifierChanged();
 
 private:
     Q_DISABLE_COPY(QWebPreferences)
