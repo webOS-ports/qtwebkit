@@ -72,6 +72,9 @@ public:
     void setFontFamily(FontFamily which, const QString& family);
     QString fontFamily(FontFamily which) const;
 
+    void setIdentifier(const QString& identifier);
+    QString identifier() const;
+
     void setFontSize(FontSizeType type, unsigned size);
     unsigned fontSize(FontSizeType type) const;
 

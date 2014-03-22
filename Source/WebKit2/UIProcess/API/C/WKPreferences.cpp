@@ -1154,3 +1154,13 @@ void WKPreferencesSetPrivileged(WKPreferencesRef preferencesRef, bool privileged
 {
     toImpl(preferencesRef)->setPrivileged(privileged);
 }
+
+void WKPreferencesSetIdentifier(WKPreferencesRef preferencesRef, WKStringRef identifier)
+{
+    toImpl(preferencesRef)->setIdentifier(toWTFString(identifier));
+}
+
+WKStringRef WKPreferencesCopyIdentifier(WKPreferencesRef preferencesRef)
+{
+    return toCopiedAPI(toImpl(preferencesRef)->identifier());
+}
