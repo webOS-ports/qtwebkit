@@ -278,6 +278,19 @@ unsigned QWebPreferencesPrivate::fontSize(QWebPreferencesPrivate::FontSizeType t
     }
 }
 
+void QWebPreferencesPrivate::setIdentifier(const QString &identifier)
+{
+    WKPreferencesRef preferencesRef = WKPageGroupGetPreferences(webViewPrivate->pageGroup.get());
+    WKRetainPtr<WKStringRef> identifierRef = adoptWK(WKStringCreateWithQString(identifier));
+    WKPreferencesSetIdentifier(preferencesRef, identifierRef.get());
+}
+
+QString QWebPreferencesPrivate::identifier() const
+{
+    WKPreferencesRef preferencesRef = WKPageGroupGetPreferences(webViewPrivate->pageGroup.get());
+    return adoptToQString(WKPreferencesCopyIdentifier(preferencesRef));
+}
+
 QWebPreferences::QWebPreferences()
     : d(new QWebPreferencesPrivate)
 {
@@ -639,6 +652,17 @@ void QWebPreferences::setPrivileged(bool value)
         return;
     d->setAttribute(QWebPreferencesPrivate::Privileged, value);
     emit privilegedChanged();
+}
+
+void QWebPreferences::setIdentifier(const QString &identifier)
+{
+    d->setIdentifier(identifier);
+    emit identifierChanged();
+}
+
+QString QWebPreferences::identifier() const
+{
+    return d->identifier();
 }
 
 QWebPreferencesPrivate* QWebPreferencesPrivate::get(QWebPreferences* preferences)

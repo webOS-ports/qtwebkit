@@ -218,6 +218,7 @@ namespace WebKit {
     FOR_EACH_WEBKIT_FONT_FAMILY_PREFERENCE(macro) \
     macro(DefaultTextEncodingName, defaultTextEncodingName, String, String, "ISO-8859-1") \
     macro(FTPDirectoryTemplatePath, ftpDirectoryTemplatePath, String, String, "") \
+    macro(Identifier, identifier, String, String, "") \
     \
 
 #define FOR_EACH_WEBKIT_STRING_PREFERENCE_NOT_IN_WEBCORE(macro) \
