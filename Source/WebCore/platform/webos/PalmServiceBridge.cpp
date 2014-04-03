@@ -117,8 +117,21 @@ PalmServiceBridge::PalmServiceBridge(ScriptExecutionContext* context, bool subsc
 #ifndef NDEBUG
     serviceBridgeCounter.increment();
 #endif
-
-    m_identifier = strdup(document()->page()->settings()->identifier().utf8().data());
+    Frame *frame = document()->frame();
+    if (document()->page()->mainFrame() == frame) {
+        m_identifier = strdup(document()->page()->settings()->identifier().utf8().data());
+    }
+    else {
+        JSValue identifier;
+        ExecState* exec = 0;
+        Frame *frame = document()->frame();
+        if (frame) {
+            identifier = frame->script()->executeScript(ScriptSourceCode("PalmSystem && PalmSystem.getIdentifierForFrame(window.frameElement.id, window.frameElement.src)")).jsValue();
+            JSGlobalObject* globalObject = frame->script()->bindingRootObject()->globalObject();
+            exec = globalObject->globalExec();
+            m_identifier = strdup(identifier.toString(exec)->value(exec).utf8().data());
+        }
+    }
 
     if (document()->page() != 0)
         m_isPrivileged = document()->page()->settings()->privileged();
