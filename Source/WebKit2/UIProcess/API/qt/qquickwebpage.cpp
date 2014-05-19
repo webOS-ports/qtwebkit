@@ -93,7 +93,7 @@ QSGNode* QQuickWebPage::updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData*)
     node->setCoordinatedGraphicsScene(scene);
 
     node->setScale(d->contentsScale);
-    node->setDevicePixelRatio(window->devicePixelRatio());
+    node->setDevicePixelRatio(getenv("QTWEBKIT_DPR") ? atof(getenv("QTWEBKIT_DPR")) : window->devicePixelRatio());
     QColor backgroundColor = webViewPrivate->transparentBackground() ? Qt::transparent : Qt::white;
     QRectF backgroundRect(QPointF(0, 0), d->contentsSize);
     node->setBackground(backgroundRect, backgroundColor);
