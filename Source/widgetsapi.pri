@@ -71,6 +71,8 @@ QT_API_DEPENDS = core gui widgets network webkit
 
 BASE_TARGET = $$TARGET
 
+CMAKE_MODULE_TESTS = $$ROOT_WEBKIT_DIR/Source/WebKit/qt/tests/cmake
+
 load(qt_module)
 
 # Make sure the install_name of the QtWebKit library point to webkit
