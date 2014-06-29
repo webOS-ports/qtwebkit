@@ -625,6 +625,8 @@ void ArgumentCoder<WindowFeatures>::encode(ArgumentEncoder& encoder, const Windo
     encoder << windowFeatures.resizable;
     encoder << windowFeatures.fullscreen;
     encoder << windowFeatures.dialog;
+    encoder << windowFeatures.attributesSet;
+    encoder << windowFeatures.attributes;
 }
 
 bool ArgumentCoder<WindowFeatures>::decode(ArgumentDecoder& decoder, WindowFeatures& windowFeatures)
@@ -660,6 +662,10 @@ bool ArgumentCoder<WindowFeatures>::decode(ArgumentDecoder& decoder, WindowFeatu
     if (!decoder.decode(windowFeatures.fullscreen))
         return false;
     if (!decoder.decode(windowFeatures.dialog))
+        return false;
+    if (!decoder.decode(windowFeatures.attributesSet))
+        return false;
+    if (!decoder.decode(windowFeatures.attributes))
         return false;
     return true;
 }

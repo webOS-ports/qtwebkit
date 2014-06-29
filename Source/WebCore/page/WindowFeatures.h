@@ -50,6 +50,7 @@ struct WindowFeatures {
         , resizable(true)
         , fullscreen(false)
         , dialog(false)
+        , attributesSet(false)
     {
     }
     explicit WindowFeatures(const String& windowFeaturesString);
@@ -73,6 +74,9 @@ struct WindowFeatures {
 
     bool fullscreen;
     bool dialog;
+
+    bool attributesSet;
+    String attributes;
 
     Vector<String> additionalFeatures;
 
