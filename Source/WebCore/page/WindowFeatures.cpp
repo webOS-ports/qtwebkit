@@ -43,6 +43,7 @@ WindowFeatures::WindowFeatures(const String& features)
     , heightSet(false)
     , fullscreen(false)
     , dialog(false)
+    , attributesSet(false)
 {
     /*
      The IE rule is: all features except for channelmode and fullscreen default to YES, but
@@ -156,7 +157,10 @@ void WindowFeatures::setWindowFeature(const String& keyString, const String& val
         fullscreen = value;
     else if (keyString == "scrollbars")
         scrollbarsVisible = value;
-    else if (value == 1)
+    else if (keyString == "attributes") {
+        attributesSet = true;
+        attributes = valueString;
+     } else if (value == 1)
         additionalFeatures.append(keyString);
 }
 
