@@ -71,6 +71,8 @@ PassRefPtr<WebPageProxy> WebUIClient::createNewPage(WebPageProxy* page, const Re
     map.set("resizable", WebBoolean::create(windowFeatures.resizable));
     map.set("fullscreen", WebBoolean::create(windowFeatures.fullscreen));
     map.set("dialog", WebBoolean::create(windowFeatures.dialog));
+    if (windowFeatures.attributesSet)
+        map.set("attributes", WebString::create(windowFeatures.attributes));
     RefPtr<ImmutableDictionary> featuresMap = ImmutableDictionary::adopt(map);
 
     if (!m_client.version)
