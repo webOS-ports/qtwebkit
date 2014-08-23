@@ -211,9 +211,11 @@ private:
     QPointF contentPos() const;
     void setContentPos(const QPointF&);
 
+public:
     QQuickWebView(WKContextRef, WKPageGroupRef, QQuickItem* parent = 0);
     WKPageRef pageRef() const;
 
+private:
     void emitUrlChangeIfNeeded();
 
     Q_PRIVATE_SLOT(d_func(), void _q_onVisibleChanged());
