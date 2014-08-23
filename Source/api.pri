@@ -112,3 +112,23 @@ qnx {
     QMAKE_EXTRA_TARGETS += dummyfile
     GENERATED_SOURCES += $$dummyfile.target
 }
+
+# Install additional API from JavaScriptCore and WebKit2
+JAVASCRIPTCORE_HEADERS.path = $$[QT_INSTALL_HEADERS]/$$QT.webkit.name/JavaScriptCore
+JAVASCRIPTCORE_HEADERS.files = $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JSBase.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JSContextRef.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JSObjectRef.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JSStringRef.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JSStringRefBSTR.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JSStringRefCF.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JSValueRef.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JavaScript.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/JavaScriptCore.h \
+                  $${ROOT_WEBKIT_DIR}/Source/JavaScriptCore/API/WebKitAvailability.h
+
+WEBKIT2_HEADERS.path = $$[QT_INSTALL_HEADERS]/$$QT.webkit.name/WebKit2
+WEBKIT2_HEADERS.files = $${ROOT_WEBKIT_DIR}/Source/WebKit2/Shared/API/c/*.h \
+                  $${ROOT_WEBKIT_DIR}/Source/WebKit2/WebProcess/InjectedBundle/API/c/*.h \
+                  $${ROOT_WEBKIT_DIR}/Source/WebKit2/UIProcess/API/C/*.h
+
+INSTALLS += JAVASCRIPTCORE_HEADERS WEBKIT2_HEADERS
