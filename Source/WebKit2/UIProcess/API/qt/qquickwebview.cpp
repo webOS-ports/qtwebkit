@@ -2383,6 +2383,12 @@ void QQuickWebViewPrivate::didFailToFindString(WKPageRef page, WKStringRef strin
     QQuickWebViewPrivate::didFindString(page, string, 0, clientInfo);
 }
 
+void QQuickWebView::clearMemoryCaches()
+{
+    Q_D(QQuickWebView);
+    WKContextClearMemoryCaches(d->context->context());
+}
+
 /*!
     \qmlsignal WebView::onLoadingChanged(loadRequest)
 

@@ -1183,6 +1183,11 @@ void WebContext::setJavaScriptGarbageCollectorTimerEnabled(bool flag)
     sendToAllProcesses(Messages::WebProcess::SetJavaScriptGarbageCollectorTimerEnabled(flag));
 }
 
+void WebContext::clearMemoryCaches()
+{
+    sendToAllProcesses(Messages::WebProcess::ClearMemoryCaches());
+}
+
 void WebContext::addPlugInAutoStartOriginHash(const String& pageOrigin, unsigned plugInOriginHash)
 {
     m_plugInAutoStartProvider.addAutoStartOriginHash(pageOrigin, plugInOriginHash);

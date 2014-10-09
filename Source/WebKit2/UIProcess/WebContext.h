@@ -249,6 +249,8 @@ public:
     void garbageCollectJavaScriptObjects();
     void setJavaScriptGarbageCollectorTimerEnabled(bool flag);
 
+    void clearMemoryCaches();
+
 #if PLATFORM(MAC)
     static bool omitPDFSupport();
 #endif

@@ -79,6 +79,8 @@
 #include <WebCore/SecurityOrigin.h>
 #include <WebCore/Settings.h>
 #include <WebCore/StorageTracker.h>
+#include <WebCore/WorkerThread.h>
+#include <WebCore/StorageThread.h>
 #include <wtf/CurrentTime.h>
 #include <wtf/HashCountedSet.h>
 #include <wtf/PassRefPtr.h>
@@ -1021,6 +1023,40 @@ void WebProcess::garbageCollectJavaScriptObjects()
 void WebProcess::setJavaScriptGarbageCollectorTimerEnabled(bool flag)
 {
     gcController().setJavaScriptGarbageCollectorTimerEnabled(flag);
+}
+
+void WebProcess::clearMemoryCaches()
+{
+    // Turn the cache on and off.  Disabling the object cache will remove all
+    // resources from the cache.  They may still live on if they are referenced
+    // by some Web page though.
+    if (!WebCore::memoryCache()->disabled()) {
+        WebCore::memoryCache()->setDisabled(true);
+        WebCore::memoryCache()->setDisabled(false);
+    }
+
+    int pageCapacity = WebCore::pageCache()->capacity();
+    // Setting size to 0, makes all pages be released.
+    WebCore::pageCache()->setCapacity(0);
+    WebCore::pageCache()->setCapacity(pageCapacity);
+
+    // Invalidating the font cache and freeing all inactive font data.
+    WebCore::fontCache()->invalidate();
+
+    // Empty the Cross-Origin Preflight cache
+    WebCore::CrossOriginPreflightResultCache::shared().empty();
+
+    // Drop JIT compiled code from ExecutableAllocator.
+    WebCore::gcController().discardAllCompiledCode();
+    // Garbage Collect to release the references of CachedResource from dead objects.
+    WebCore::gcController().garbageCollectNow();
+
+    // FastMalloc has lock-free thread specific caches that can only be cleared from the thread itself.
+    WebCore::StorageThread::releaseFastMallocFreeMemoryInAllThreads();
+#if ENABLE(WORKERS)
+    WebCore::WorkerThread::releaseFastMallocFreeMemoryInAllThreads();
+#endif
+    WTF::releaseFastMallocFreeMemory();
 }
 
 void WebProcess::postInjectedBundleMessage(const CoreIPC::DataReference& messageData)
