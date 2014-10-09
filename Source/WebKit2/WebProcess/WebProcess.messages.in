@@ -82,6 +82,8 @@ messages -> WebProcess LegacyReceiver {
     GarbageCollectJavaScriptObjects()
     SetJavaScriptGarbageCollectorTimerEnabled(bool enable)
 
+    ClearMemoryCaches()
+
     PostInjectedBundleMessage(CoreIPC::DataReference messageData);
 
     ReleasePageCache()
