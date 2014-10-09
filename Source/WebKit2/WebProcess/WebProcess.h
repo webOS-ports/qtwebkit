@@ -230,6 +230,8 @@ private:
     void garbageCollectJavaScriptObjects();
     void setJavaScriptGarbageCollectorTimerEnabled(bool flag);
 
+    void clearMemoryCaches();
+
     void releasePageCache();
 
 #if USE(SOUP)

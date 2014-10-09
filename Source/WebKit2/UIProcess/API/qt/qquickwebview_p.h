@@ -159,6 +159,10 @@ public:
     bool allowAnyHTTPSCertificateForLocalHost() const;
     void setAllowAnyHTTPSCertificateForLocalHost(bool allow);
 
+    // Frees up as much memory as possible by calling the JavaScript garbage collector
+    // and cleaning all memory caches such as page, object and font cache.
+    void clearMemoryCaches();
+
 public Q_SLOTS:
     void loadHtml(const QString& html, const QUrl& baseUrl = QUrl(), const QUrl& unreachableUrl = QUrl());
 

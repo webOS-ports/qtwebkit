@@ -388,6 +388,11 @@ void WKContextSetInvalidMessageFunction(WKContextInvalidMessageFunction invalidM
     WebContext::setInvalidMessageCallback(invalidMessageFunction);
 }
 
+void WKContextClearMemoryCaches(WKContextRef contextRef)
+{
+    toImpl(contextRef)->clearMemoryCaches();
+}
+
 // Deprecated functions.
 void _WKContextSetAdditionalPluginsDirectory(WKContextRef context, WKStringRef pluginsDirectory)
 {

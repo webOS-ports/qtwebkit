@@ -207,6 +207,8 @@ WK_EXPORT WKDictionaryRef WKContextCopyPlugInAutoStartOriginHashes(WKContextRef 
 WK_EXPORT void WKContextSetPlugInAutoStartOriginHashes(WKContextRef context, WKDictionaryRef dictionary);
 WK_EXPORT void WKContextSetPlugInAutoStartOrigins(WKContextRef contextRef, WKArrayRef arrayRef);
 
+WK_EXPORT void WKContextClearMemoryCaches(WKContextRef contextRef);
+
 #ifdef __cplusplus
 }
 #endif
