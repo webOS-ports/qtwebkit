@@ -42,16 +42,10 @@ namespace WebKit {
 typedef JSClassRef (*CreateClassRefCallback)();
 
 static void registerNavigatorObject(JSObjectRef *object, JSStringRef name,
-                                    JSGlobalContextRef context, void* data,
-                                    CreateClassRefCallback createClassRefCallback,
+                                    JSGlobalContextRef context,
                                     JSStringRef postMessageName, JSObjectCallAsFunctionCallback postMessageCallback)
 {
     static JSStringRef navigatorName = JSStringCreateWithUTF8CString("navigator");
-
-    if (*object)
-        JSValueUnprotect(context, *object);
-    *object = JSObjectMake(context, createClassRefCallback(), data);
-    JSValueProtect(context, *object);
 
     JSObjectRef postMessage = JSObjectMakeFunctionWithCallback(context, postMessageName, postMessageCallback);
     JSObjectSetProperty(context, *object, postMessageName, postMessage, kJSPropertyAttributeDontDelete | kJSPropertyAttributeReadOnly, 0);
@@ -296,16 +290,19 @@ void QtBuiltinBundlePage::setNavigatorQtObjectEnabled(bool enabled)
 void QtBuiltinBundlePage::registerNavigatorQtObject(JSGlobalContextRef context)
 {
     static JSStringRef name = JSStringCreateWithUTF8CString("qt");
-    static JSStringRef postMessageName = JSStringCreateWithUTF8CString("postMessage");
-    registerNavigatorObject(&m_navigatorQtObject, name, context, this,
-                            &navigatorQtObjectClass,
-                            postMessageName, &qt_postMessageCallback);
+
+    if (m_navigatorQtObject)
+        JSValueUnprotect(context, m_navigatorQtObject);
+    m_navigatorQtObject = JSObjectMake(context, navigatorQtObjectClass(), this);
+    JSValueProtect(context, m_navigatorQtObject);
 
     static JSStringRef postSyncMessageName = JSStringCreateWithUTF8CString("postSyncMessage");
-    static JSStringRef syncName = JSStringCreateWithUTF8CString("qt");
-    registerNavigatorObject(&m_navigatorQtObject, syncName, context, this,
-                            &navigatorQtObjectClass,
+    registerNavigatorObject(&m_navigatorQtObject, name, context,
                             postSyncMessageName, &qt_postSyncMessageCallback);
+
+    static JSStringRef postMessageName = JSStringCreateWithUTF8CString("postMessage");
+    registerNavigatorObject(&m_navigatorQtObject, name, context,
+                            postMessageName, &qt_postMessageCallback);
 }
 
 #ifdef HAVE_WEBCHANNEL
