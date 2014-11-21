@@ -171,6 +171,7 @@ Settings::Settings(Page* page)
 #endif
     , m_privileged(false)
     , m_identifier("")
+    , m_appRuntime(false)
 {
     // A Frame may not have been created yet, so we initialize the AtomicString
     // hash before trying to use it.
@@ -627,6 +628,11 @@ void Settings::setPrivileged(bool flag)
 void Settings::setIdentifier(const String& identifier)
 {
     m_identifier = identifier;
+}
+
+void Settings::setAppRuntime(bool appRuntime)
+{
+    m_appRuntime = appRuntime;
 }
 
 
