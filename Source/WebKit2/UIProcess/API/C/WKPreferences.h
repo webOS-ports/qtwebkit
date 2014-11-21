@@ -248,6 +248,10 @@ WK_EXPORT void WKPreferencesSetPrivileged(WKPreferencesRef preferencesRef, bool 
 WK_EXPORT void WKPreferencesSetIdentifier(WKPreferencesRef preferencesRef, WKStringRef identifier);
 WK_EXPORT WKStringRef WKPreferencesCopyIdentifier(WKPreferencesRef preferencesRef);
 
+// Defaults to false
+WK_EXPORT void WKPreferencesSetAppRuntime(WKPreferencesRef preferencesRef, bool appRuntime);
+WK_EXPORT bool WKPreferencesGetAppRuntime(WKPreferencesRef preferencesRef);
+
 #ifdef __cplusplus
 }
 #endif

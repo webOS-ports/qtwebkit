@@ -65,6 +65,7 @@ public:
 
     Q_PROPERTY(bool privileged READ privileged WRITE setPrivileged NOTIFY privilegedChanged FINAL)
     Q_PROPERTY(QString identifier READ identifier WRITE setIdentifier NOTIFY identifierChanged FINAL)
+    Q_PROPERTY(bool appRuntime READ appRuntime WRITE setAppRuntime NOTIFY appRuntimeChanged FINAL)
 
     bool autoLoadImages() const;
     void setAutoLoadImages(bool enable);
@@ -156,6 +157,9 @@ public:
     QString identifier() const;
     void setIdentifier(const QString& identifier);
 
+    bool appRuntime() const;
+    void setAppRuntime(bool value);
+
 Q_SIGNALS:
     void autoLoadImagesChanged();
     void pluginsEnabledChanged();
@@ -191,6 +195,7 @@ Q_SIGNALS:
 
     void privilegedChanged();
     void identifierChanged();
+    void appRuntimeChanged();
 
 private:
     Q_DISABLE_COPY(QWebPreferences)

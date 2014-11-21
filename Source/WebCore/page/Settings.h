@@ -267,6 +267,9 @@ namespace WebCore {
         void setIdentifier(const String&);
         String identifier() const { return m_identifier; }
 
+        void setAppRuntime(bool);
+        bool appRuntime() const { return m_appRuntime; }
+
     private:
         explicit Settings(Page*);
 
@@ -353,6 +356,8 @@ namespace WebCore {
         bool m_privileged;
 
         String m_identifier;
+
+        bool m_appRuntime;
     };
 
 } // namespace WebCore

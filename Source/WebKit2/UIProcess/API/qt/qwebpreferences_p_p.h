@@ -45,7 +45,8 @@ public:
         UniversalAccessFromFileURLsAllowed,
         FileAccessFromFileURLsAllowed,
         LogsPageMessagesToSystemConsoleEnabled,
-        Privileged
+        Privileged,
+        AppRuntime
     };
 
     enum FontFamily {
