@@ -2595,6 +2595,7 @@ void WebPage::updatePreferences(const WebPreferencesStore& store)
     settings->setLowPowerVideoAudioBufferSizeEnabled(store.getBoolValueForKey(WebPreferencesKey::lowPowerVideoAudioBufferSizeEnabledKey()));
 
     settings->setPrivileged(store.getBoolValueForKey(WebPreferencesKey::privilegedKey()));
+    settings->setAppRuntime(store.getBoolValueForKey(WebPreferencesKey::appRuntimeKey()));
 
     platformPreferencesDidChange(store);
 
