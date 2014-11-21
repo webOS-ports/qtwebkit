@@ -1164,3 +1164,13 @@ WKStringRef WKPreferencesCopyIdentifier(WKPreferencesRef preferencesRef)
 {
     return toCopiedAPI(toImpl(preferencesRef)->identifier());
 }
+
+bool WKPreferencesGetAppRuntime(WKPreferencesRef preferencesRef)
+{
+    return toImpl(preferencesRef)->appRuntime();
+}
+
+void WKPreferencesSetAppRuntime(WKPreferencesRef preferencesRef, bool appRuntime)
+{
+    toImpl(preferencesRef)->setAppRuntime(appRuntime);
+}

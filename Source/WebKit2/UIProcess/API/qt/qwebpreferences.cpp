@@ -88,6 +88,8 @@ bool QWebPreferencesPrivate::testAttribute(QWebPreferencesPrivate::WebAttribute 
         return WKPreferencesGetLogsPageMessagesToSystemConsoleEnabled(preferencesRef);
     case Privileged:
         return WKPreferencesGetPrivileged(preferencesRef);
+    case AppRuntime:
+        return WKPreferencesGetAppRuntime(preferencesRef);
     default:
         ASSERT_NOT_REACHED();
         return false;
@@ -165,6 +167,9 @@ void QWebPreferencesPrivate::setAttribute(QWebPreferencesPrivate::WebAttribute a
         break;
     case Privileged:
         WKPreferencesSetPrivileged(preferencesRef, enable);
+        break;
+    case AppRuntime:
+        WKPreferencesSetAppRuntime(preferencesRef, enable);
         break;
     default:
         ASSERT_NOT_REACHED();
@@ -663,6 +668,20 @@ void QWebPreferences::setIdentifier(const QString &identifier)
 QString QWebPreferences::identifier() const
 {
     return d->identifier();
+}
+
+bool QWebPreferences::appRuntime() const
+{
+    return d->testAttribute(QWebPreferencesPrivate::AppRuntime);
+}
+
+void QWebPreferences::setAppRuntime(bool value)
+{
+    if (appRuntime() == value)
+        return;
+
+    d->setAttribute(QWebPreferencesPrivate::AppRuntime, value);
+    emit appRuntimeChanged();
 }
 
 QWebPreferencesPrivate* QWebPreferencesPrivate::get(QWebPreferences* preferences)
