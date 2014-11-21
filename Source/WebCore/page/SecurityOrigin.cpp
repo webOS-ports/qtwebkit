@@ -35,9 +35,13 @@
 #include "SchemeRegistry.h"
 #include "SecurityPolicy.h"
 #include "ThreadableBlobRegistry.h"
+#include "Document.h"
+#include "DOMWindow.h"
+#include <wtf/text/CString.h>
 #include <wtf/MainThread.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/StringBuilder.h>
+#include <glib.h>
 
 namespace WebCore {
 
@@ -127,6 +131,7 @@ SecurityOrigin::SecurityOrigin(const KURL& url)
     , m_storageBlockingPolicy(AllowAllStorage)
     , m_enforceFilePathSeparation(false)
     , m_needsDatabaseIdentifierQuirkForFiles(false)
+    , m_appRuntime(false)
 {
     // document.domain starts as m_host, but can be set by the DOM.
     m_domain = m_host;
@@ -284,6 +289,9 @@ bool SecurityOrigin::passesFileCheck(const SecurityOrigin* other) const
     if (!m_enforceFilePathSeparation && !other->m_enforceFilePathSeparation)
         return true;
 
+    if (m_appRuntime && isAllowedFileAccess(m_filePath, other->m_filePath))
+        return true;
+
     return (m_filePath == other->m_filePath);
 }
 
@@ -297,6 +305,16 @@ bool SecurityOrigin::canRequest(const KURL& url) const
 
     if (isUnique())
         return false;
+
+    // This will allow XMLHttpRequests from local to local and remote
+    if (m_appRuntime && isLocal()) {
+        // If the file is not local, allow it. If the file is among the set of
+        // files that this security origin is allowed to access, allow it.
+        if (!url.isLocalFile() || isAllowedFileAccess(this, url.string()))
+            return true;
+
+        return false;
+    }
 
     RefPtr<SecurityOrigin> targetOrigin = SecurityOrigin::create(url);
 
@@ -605,4 +623,163 @@ String SecurityOrigin::urlWithUniqueSecurityOrigin()
     return uniqueSecurityOriginURL;
 }
 
-} // namespace WebCore
+void SecurityOrigin::enableAppRuntime()
+{
+    m_appRuntime = true;
+}
+
+// list of globally permitted targets
+static const String sAllowedTargetPaths[] = {
+        "/usr/palm/frameworks/",
+        "/media/internal/",
+        "/usr/lib/luna/luna-media/",
+        "/var/luna/files/",
+        "/var/luna/data/extractfs/",
+        "/var/luna/data/im-avatars/",
+        "/usr/palm/applications/com.palm.app.contacts/sharedWidgets/",
+        "/usr/palm/sysmgr/",
+        "/usr/palm/public",
+        "/var/file-cache/",
+        "/usr/lib/luna/system/luna-systemui/images/",
+        "/usr/lib/luna/system/luna-systemui/app/FilePicker"
+};
+static const int kAllowedTargetPathsNum = G_N_ELEMENTS(sAllowedTargetPaths);
+
+// list of Palm app dirs
+static const int kPalmAppPathsNum = 7;
+static const String sPalmAppPaths[kPalmAppPathsNum] = {
+        "/usr/lib/luna/system/",   // system ui apps
+        "/usr/palm/applications/",  // Palm apps
+        "/var/usr/palm/applications/com.palm.",  // privileged apps like facebook
+        "/media/cryptofs/apps/usr/palm/applications/com.palm.",  // privileged 3rd party apps
+        "/usr/palm/sysmgr/",
+        "/var/usr/palm/applications/com/palm/",  // support for KURL virtual hosts that have had all periods swapped for slashes
+        "/media/cryptofs/apps/usr/palm/applications/com/palm/"
+};
+
+// list of non-Palm app dirs
+static const int kUnprivilegedAppPathsNum = 2;
+static const String sUnprivilegedAppPaths[kUnprivilegedAppPathsNum] = {
+        "/var/usr/palm/applications/",  // old path
+        "/media/cryptofs/apps/usr/palm/applications/"
+};
+
+// whitelist of paths for Palm apps. stopgap for code injection attacks
+static const int kPalmAppTargetPathsNum = 4;
+static const String sPalmAppTargetPaths[kPalmAppTargetPathsNum] = {
+        "/usr/",
+        "/media/",
+        "/tmp/",
+        "/var/"
+};
+
+bool SecurityOrigin::isAllowedFileAccess(const String& caller, const String& target)
+{
+    if (caller == "" || target == "") {
+        return true;
+    }
+
+    // KURL resolves occurrences of "/../" in path
+    String targetPath = (KURL(ParsedURLString, target)).fileSystemPath();
+
+    // allow about:blank to load any app resource
+    if (caller == "about:blank")  // KURL-parsed callerPath will be empty
+    {
+        // target can be Palm app
+        for (int p = 0; p < kPalmAppPathsNum; p++) {
+            if (targetPath.startsWith(sPalmAppPaths[p])) {
+                return true;
+            }
+        }
+
+        // target can be non-Palm app
+        for (int p=0; p < kUnprivilegedAppPathsNum; p++) {
+            if (targetPath.startsWith(sUnprivilegedAppPaths[p])) {
+                return true;
+            }
+        }
+    }
+
+    // check general target whitelist
+    for (int p = 0; p < kAllowedTargetPathsNum; p++) {
+        if (targetPath.startsWith(sAllowedTargetPaths[p])) {
+            return true;
+        }
+    }
+
+    // if caller is a palm app, allow access to a larger whitelist of paths
+    String callerPath = (KURL(ParsedURLString, caller)).fileSystemPath();
+
+    bool palmApp = privilegedApp(callerPath);
+
+    if (palmApp) {
+        for (int p=0; p < kPalmAppTargetPathsNum; p++) {
+            if (targetPath.startsWith(sPalmAppTargetPaths[p])) {
+                return true;
+            }
+        }
+    }
+
+    // non-palm apps can access only their own files
+    if (!palmApp)
+    {
+        // target can be non-Palm app
+        bool unprivilegedApp = false;
+        int startOfName = -1;
+        for (int p=0; p < kUnprivilegedAppPathsNum; p++) {
+            if (targetPath.startsWith(sUnprivilegedAppPaths[p])) {
+                unprivilegedApp = true;
+                startOfName = sUnprivilegedAppPaths[p].length();
+                break;
+            }
+        }
+
+        if (unprivilegedApp) {
+            // find the next occurrence of '/' after target path
+            // assume this is the application name, and ensure that caller and target
+            // application names are the same. Because '.' in the caller path may
+            // have changed to '/', replace for this comparison
+
+            size_t targetAppNameLength = targetPath.find('/', startOfName) - startOfName;
+            //int callerAppNameLength = callerPath.find('/', startOfName) - startOfName;
+
+            if (targetAppNameLength > 0
+                    && targetAppNameLength < callerPath.length() + 1
+                    && callerPath.replace('/', '.').substring(startOfName, targetAppNameLength) == targetPath.substring(startOfName, targetAppNameLength))
+                // source and target belong to same app
+                return true;
+            else if (targetPath.startsWith("/usr/palm/sysmgr/"))
+                // Special case: allow all apps to access the SysMgr directory
+                return true;
+        }
+    }
+
+#if 0
+    g_warning("%s: *** NOT ALLOWING FILE ACCESS ***   caller: %s   target: %s\n",
+            __FUNCTION__,
+            callerPath.utf8().data(),
+            targetPath.utf8().data());
+#endif
+
+    return false;
+}
+
+bool SecurityOrigin::isAllowedFileAccess(const SecurityOrigin* caller, const String& target)
+{
+    String callerHost = caller->host();
+    if (callerHost.startsWith("."))
+        callerHost = "file://" + callerHost.replace('.', '/');
+    return SecurityOrigin::isAllowedFileAccess(callerHost, target);
+}
+
+bool SecurityOrigin::privilegedApp(const String& fileSytemPath)
+{
+    for (int p = 0; p < kPalmAppPathsNum; p++) {
+        if (fileSytemPath.startsWith(sPalmAppPaths[p])) {
+            return true;
+        }
+    }
+    return false;
+}
+
+}

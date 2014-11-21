@@ -4580,6 +4580,9 @@ void Document::initSecurityContext()
             }
         }
         securityOrigin()->setStorageBlockingPolicy(settings->storageBlockingPolicy());
+
+        if (settings->appRuntime())
+            securityOrigin()->enableAppRuntime();
     }
 
     Document* parentDocument = ownerElement() ? ownerElement()->document() : 0;

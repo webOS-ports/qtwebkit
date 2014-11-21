@@ -35,6 +35,7 @@
 namespace WebCore {
 
 class KURL;
+class Document;
 
 class SecurityOrigin : public ThreadSafeRefCounted<SecurityOrigin> {
 public:
@@ -205,7 +206,13 @@ public:
     // (and whether it was set) but considering the host. It is used for postMessage.
     bool isSameSchemeHostPort(const SecurityOrigin*) const;
 
+    void enableAppRuntime();
+
     static String urlWithUniqueSecurityOrigin();
+
+    static bool isAllowedFileAccess(const SecurityOrigin* securityOrigin, const String& target);
+    static bool isAllowedFileAccess(const String& caller, const String& target);
+    static bool privilegedApp(const String& fileSystemPath);
 
 private:
     SecurityOrigin();
@@ -231,6 +238,7 @@ private:
     StorageBlockingPolicy m_storageBlockingPolicy;
     bool m_enforceFilePathSeparation;
     bool m_needsDatabaseIdentifierQuirkForFiles;
+    bool m_appRuntime;
 };
 
 } // namespace WebCore
