@@ -675,12 +675,15 @@ static const String sPalmAppTargetPaths[kPalmAppTargetPathsNum] = {
 
 bool SecurityOrigin::isAllowedFileAccess(const String& caller, const String& target)
 {
-    if (caller == "" || target == "") {
-        return true;
-    }
+    if (caller == "" || target == "")
+        return false;
 
     // KURL resolves occurrences of "/../" in path
-    String targetPath = (KURL(ParsedURLString, target)).fileSystemPath();
+    KURL targetUrl(ParsedURLString, target);
+    String targetPath = targetUrl.fileSystemPath();
+
+    if (targetPath.length() == 0 && !target.startsWith("file://"))
+        targetPath = target;
 
     // allow about:blank to load any app resource
     if (caller == "about:blank")  // KURL-parsed callerPath will be empty
@@ -708,15 +711,15 @@ bool SecurityOrigin::isAllowedFileAccess(const String& caller, const String& tar
     }
 
     // if caller is a palm app, allow access to a larger whitelist of paths
-    String callerPath = (KURL(ParsedURLString, caller)).fileSystemPath();
+    // String callerPath = (KURL(ParsedURLString, caller)).fileSystemPath();
+    String callerPath = caller;
 
     bool palmApp = privilegedApp(callerPath);
 
     if (palmApp) {
         for (int p=0; p < kPalmAppTargetPathsNum; p++) {
-            if (targetPath.startsWith(sPalmAppTargetPaths[p])) {
+            if (targetPath.startsWith(sPalmAppTargetPaths[p]))
                 return true;
-            }
         }
     }
 
@@ -741,7 +744,6 @@ bool SecurityOrigin::isAllowedFileAccess(const String& caller, const String& tar
             // have changed to '/', replace for this comparison
 
             size_t targetAppNameLength = targetPath.find('/', startOfName) - startOfName;
-            //int callerAppNameLength = callerPath.find('/', startOfName) - startOfName;
 
             if (targetAppNameLength > 0
                     && targetAppNameLength < callerPath.length() + 1
@@ -754,12 +756,10 @@ bool SecurityOrigin::isAllowedFileAccess(const String& caller, const String& tar
         }
     }
 
-#if 0
     g_warning("%s: *** NOT ALLOWING FILE ACCESS ***   caller: %s   target: %s\n",
             __FUNCTION__,
             callerPath.utf8().data(),
             targetPath.utf8().data());
-#endif
 
     return false;
 }
@@ -767,8 +767,12 @@ bool SecurityOrigin::isAllowedFileAccess(const String& caller, const String& tar
 bool SecurityOrigin::isAllowedFileAccess(const SecurityOrigin* caller, const String& target)
 {
     String callerHost = caller->host();
+    if (caller->host().length() == 0)
+        callerHost = caller->m_filePath;
+
     if (callerHost.startsWith("."))
         callerHost = "file://" + callerHost.replace('.', '/');
+
     return SecurityOrigin::isAllowedFileAccess(callerHost, target);
 }
 
