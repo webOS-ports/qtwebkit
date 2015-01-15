@@ -1,6 +1,7 @@
 #include "config.h"
 #include <glib.h>
 #include "LunaServiceMgr.h"
+#include "Logging.h"
 
 #include <unistd.h>
 #include <lunaservice.h>
@@ -101,6 +102,9 @@ bool LunaServiceManager::init()
     LSError lserror;
     LSErrorInit(&lserror);
 
+
+    DEBUG("LunaServiceManager: initializing ...");
+
     String id("com.palm.luna-");
     id.append(String::number(getpid()));    
     String active = (id + "-active");
@@ -108,7 +112,7 @@ bool LunaServiceManager::init()
     init = LSRegisterPalmService(id.utf8().data(), &palmServiceHandle, &lserror);
     if (!init) 
         goto error;
-    
+
     init = LSGmainAttachPalmService(palmServiceHandle,
             g_main_loop_new(g_main_context_default(), TRUE), &lserror); 
     if (!init) 
@@ -207,6 +211,9 @@ unsigned long LunaServiceManager::call(const char* uri, const char* payload, Lun
     LSErrorInit(&lserror);
     LSMessageToken token = 0;
     LSHandle* serviceHandle = 0;
+
+    DEBUG("LunaServiceManager: calling %s payload %s inListener %p callerId %s usePrivateBus %d",
+          uri, payload, inListener, callerId, usePrivateBus);
     
     if (callerId && (!(*callerId))) 
         callerId = 0;
@@ -272,6 +279,8 @@ void LunaServiceManager::cancel(LunaServiceManagerListener* inListener)
 
     if (!inListener || !inListener->listenerToken)
         return;
+
+    DEBUG("LunaServiceManager: canceling call inListener %p", inListener);
     
     LSErrorInit(&lserror);
     
