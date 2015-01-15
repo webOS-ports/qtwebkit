@@ -268,7 +268,7 @@ enable?(opencl) {
 }
 
 enable?(PALM_SERVICE_BRIDGE) {
-    PKGCONFIG += luna-service2
+    PKGCONFIG += luna-service2 PmLogLib
 }
 
 mac {

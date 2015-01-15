@@ -1,5 +1,6 @@
 #include "config.h"
 #include "PalmServiceBridge.h"
+#include "Logging.h"
 
 #include "Document.h"
 #include "Event.h"
@@ -26,6 +27,9 @@ using namespace JSC;
 
 #include <map>
 #include <set>
+
+bool LoggingInitialized = false;
+PmLogContext LogContext;
 
 namespace WebCore {
 
@@ -112,6 +116,11 @@ PalmServiceBridge::PalmServiceBridge(ScriptExecutionContext* context, bool subsc
       m_identifier(0),
       m_isPrivileged(false)
 {
+    if (!LoggingInitialized) {
+        PmLogGetContext("QtWebProcess", &LogContext);
+        LoggingInitialized = true;
+    }
+
     addToServicesByDocument(document(), this);
 
 #ifndef NDEBUG
@@ -135,16 +144,25 @@ PalmServiceBridge::PalmServiceBridge(ScriptExecutionContext* context, bool subsc
 
     if (document()->page() != 0)
         m_isPrivileged = document()->page()->settings()->privileged();
+
+    DEBUG("PalmServiceBridge[%p]: created (subscribe %d identifier %s privileged %d)",
+          this, subscribe, m_identifier, m_isPrivileged);
 }
 
 bool PalmServiceBridge::init(Document* d, bool subscribe)
 {
     m_subscribed = subscribe;
+
+    DEBUG("PalmServiceBridge[%p]: initialized (subscribe %d)", this, subscribe);
+
     return true;
 }
 
 PalmServiceBridge::~PalmServiceBridge()
 {
+    DEBUG("PalmServiceBridge[%p]: destroying (identifier %s privileged %d subscribed %d)",
+          this, m_identifier, m_isPrivileged, m_subscribed);
+
     ExceptionCode ec;
     cancel(ec);
 
@@ -209,6 +227,9 @@ int PalmServiceBridge::token()
 
 int PalmServiceBridge::call(const String& uri, const String& payload, ExceptionCode& ec)
 {
+    DEBUG("PalmServiceBridge[%p]: calling on uri %s payload %s (identifier %s privileged %d subscribed %d)",
+          this, uri.utf8().data(), payload.utf8().data(), m_identifier, m_isPrivileged, m_subscribed);
+
     LunaServiceManager::instance()->call(uri.utf8().data(), payload.utf8().data(), this, m_identifier, m_isPrivileged);
     if (LSMESSAGE_TOKEN_INVALID == listenerToken) {
         ExceptionCode ec;
@@ -225,6 +246,9 @@ void PalmServiceBridge::serviceResponse(const char* body)
 
     if (!body)
         body = "";
+
+    DEBUG("PalmServiceBridge[%p]: got service response %s (identifier %s privileged %d subscribed %d)",
+          this, body, m_identifier, m_isPrivileged, m_subscribed);
 
     Frame* frame = document()->frame();
 
@@ -263,13 +287,21 @@ void PalmServiceBridge::cancel(ExceptionCode& ec)
         return;
 
     m_canceled = true;
-    if (listenerToken)
+    if (listenerToken) {
+        DEBUG("PalmServiceBridge[%p]: canceling current call (identifier %s privileged %d subscribed %d)",
+            this, m_identifier, m_isPrivileged, m_subscribed);
+
         LunaServiceManager::instance()->cancel(this);
+    }
 }
 
 void PalmServiceBridge::stop()
 {
     ExceptionCode ec;
+
+    DEBUG("PalmServiceBridge[%p]: stopping ... (identifier %s privileged %d subscribed %d)",
+        this, m_identifier, m_isPrivileged, m_subscribed);
+
     cancel(ec);
 }
 
